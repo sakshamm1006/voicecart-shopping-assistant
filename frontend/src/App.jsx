@@ -1,24 +1,25 @@
 import { useEffect, useRef, useState } from 'react';
 import { useSpeechRecognition } from './hooks/useSpeechRecognition';
+import { useShoppingList } from './hooks/useShoppingList';
 import { parseIntent } from './services/api';
+import ShoppingList from './components/ShoppingList';
 import './App.css';
 
 function App() {
   const { transcript, isListening, error, startListening, stopListening } = useSpeechRecognition();
-  const [parsed, setParsed] = useState(null);
+  const { items, feedback, applyIntent, removeItem } = useShoppingList();
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState(null);
   const wasListening = useRef(false);
 
-  // When listening stops and we have a transcript, send it to the backend
+  // When listening stops and there's a transcript, parse it and update the list
   useEffect(() => {
     if (wasListening.current && !isListening && transcript.trim()) {
       (async () => {
         setLoading(true);
         setApiError(null);
-        setParsed(null);
         try {
-          setParsed(await parseIntent(transcript));
+          applyIntent(await parseIntent(transcript));
         } catch (e) {
           setApiError(e.message);
         } finally {
@@ -27,7 +28,7 @@ function App() {
       })();
     }
     wasListening.current = isListening;
-  }, [isListening, transcript]);
+  }, [isListening, transcript, applyIntent]);
 
   const handleMicClick = () => {
     if (isListening) {
@@ -41,19 +42,29 @@ function App() {
     <div className="app">
       <h1>VoiceCart</h1>
 
-      <button onClick={handleMicClick} className={isListening ? 'mic-btn listening' : 'mic-btn'}>
-        {isListening ? '🎙️ Listening...' : '🎤 Tap to speak'}
+      <button
+        onClick={handleMicClick}
+        className={isListening ? 'mic-btn listening' : 'mic-btn'}
+        aria-label={isListening ? 'Stop listening' : 'Start listening'}
+      >
+        {isListening ? '⏹️' : '🎤'}
       </button>
+      <p className="mic-label">{isListening ? 'Listening…' : 'Tap to speak'}</p>
 
-      {error && <p className="error">{error}</p>}
-
-      <div className="transcript-box">
-        <p>{transcript || 'Say something like "Add milk"...'}</p>
+      <div className={transcript ? 'transcript-box has-text' : 'transcript-box'}>
+        <p>{transcript || 'Try "Add 2 bottles of water"…'}</p>
       </div>
 
-      {loading && <p>🤔 Understanding...</p>}
+      {error && <p className="error">{error}</p>}
       {apiError && <p className="error">{apiError}</p>}
-      {parsed && <pre className="parsed">{JSON.stringify(parsed, null, 2)}</pre>}
+      {loading && <p className="status">🤔 Understanding…</p>}
+      {feedback.text && !loading && (
+        <div key={feedback.n} className={`toast ${feedback.kind}`}>
+          {feedback.text}
+        </div>
+      )}
+
+      <ShoppingList items={items} onRemove={removeItem} />
     </div>
   );
 }
