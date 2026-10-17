@@ -263,3 +263,80 @@ body {
   color: var(--muted);
   text-align: center;
 }
+
+/* Suggestions */
+.suggestions {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(124, 92, 255, 0.14), rgba(0, 212, 170, 0.1));
+  border: 1px solid rgba(124, 92, 255, 0.35);
+  animation: pop 0.3s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+
+.suggestions-title {
+  margin: 0 0 10px;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #b9a8ff;
+}
+
+.suggestion-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.suggestion-chip {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  animation: pop 0.3s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+
+.suggestion-add {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 8px 8px 8px 14px;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.suggestion-add:hover {
+  background: var(--card-hover);
+}
+
+.suggestion-name {
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.suggestion-meta {
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+.suggestion-dismiss {
+  align-self: stretch;
+  padding: 0 12px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+
+.suggestion-dismiss:hover {
+  color: var(--danger);
+  background: rgba(255, 93, 115, 0.12);
+}

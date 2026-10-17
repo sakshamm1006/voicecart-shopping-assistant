@@ -3,11 +3,20 @@ import { useSpeechRecognition } from './hooks/useSpeechRecognition';
 import { useShoppingList } from './hooks/useShoppingList';
 import { parseIntent } from './services/api';
 import ShoppingList from './components/ShoppingList';
+import SuggestionChip from './components/SuggestionChip';
 import './App.css';
 
 function App() {
   const { transcript, isListening, error, startListening, stopListening } = useSpeechRecognition();
-  const { items, feedback, applyIntent, removeItem } = useShoppingList();
+  const {
+    items,
+    feedback,
+    suggestions,
+    applyIntent,
+    removeItem,
+    acceptSuggestion,
+    dismissSuggestion,
+  } = useShoppingList();
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState(null);
   const wasListening = useRef(false);
@@ -62,6 +71,22 @@ function App() {
         <div key={feedback.n} className={`toast ${feedback.kind}`}>
           {feedback.text}
         </div>
+      )}
+
+      {suggestions.length > 0 && (
+        <section className="suggestions">
+          <h2 className="suggestions-title">💡 Running low on these?</h2>
+          <div className="suggestion-list">
+            {suggestions.map((s) => (
+              <SuggestionChip
+                key={s.name}
+                suggestion={s}
+                onAccept={acceptSuggestion}
+                onDismiss={dismissSuggestion}
+              />
+            ))}
+          </div>
+        </section>
       )}
 
       <ShoppingList items={items} onRemove={removeItem} />
